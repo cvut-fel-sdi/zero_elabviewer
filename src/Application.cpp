@@ -73,6 +73,10 @@ Application::Application(){
 
     rightLayout->addWidget(new QLabel("COM port:"));
     rightLayout->addWidget(comPortList = new QListWidget());
+#ifdef Q_OS_LINUX
+    rightLayout->addWidget(comShowAllCheckbox = new QCheckBox("Show all ports"));
+    QObject::connect (comShowAllCheckbox, SIGNAL(stateChanged(int)), this, SLOT(refreshPorts(int)));
+#endif
     rightLayout->addWidget(refreshButton = new QPushButton("Refresh"));
     rightLayout->addWidget(connectButton = new QPushButton("Connect"));
     rightLayout->addWidget(disconnectButton = new QPushButton("Disconnect"));
@@ -259,6 +263,12 @@ void Application::refreshPorts(){
     QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
     comPortList->clear();
     for(int i = 0;i < ports.size();++i){
+#ifdef Q_OS_LINUX
+        /* Filter ports starting with ttyS, since those are system ports */
+        if(!comShowAllCheckbox->isChecked() && ports[i].portName().contains("ttyS")){
+           continue;
+        }
+#endif
         comPortList->addItem(ports[i].portName());
     }
 }
