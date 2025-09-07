@@ -69,6 +69,9 @@ private:
     QWidget *rightPanel;
 
     QListWidget* comPortList;
+#ifdef Q_OS_LINUX
+    QCheckBox* comShowAllCheckbox;
+#endif
     QPushButton* connectButton;
     QPushButton* disconnectButton;
     QPushButton* refreshButton;
@@ -94,6 +97,12 @@ protected:
 private slots:
     void quit();
     void refreshPorts();
+#ifdef Q_OS_LINUX
+    void refreshPorts(int filter) {
+      /* Used by comShowAllCheckbox */
+      refreshPorts();
+    }
+#endif
     void connectPort();
     void disconnectPort();
     void readPort();
